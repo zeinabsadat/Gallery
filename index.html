@@ -8,31 +8,28 @@
   html, body {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
+    height: 100%;
     background: transparent;
-    overflow: hidden;
-    font-family: system-ui, -apple-system, sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: system-ui, -apple-system, sans-serif;
   }
 
-  /* همیشه مربع — کوچیکتر از iframe برای جا دادن سایه */
   .photo-card {
-    width: 88vmin;
-    height: 88vmin;
+    width: 200px;
+    height: 200px;
     background: #ffffff;
-    border-radius: 14%;
+    border-radius: 28px;
     box-shadow:
-      0 3vmin 8vmin rgba(0, 0, 0, 0.08),
-      0 0.8vmin 2vmin rgba(0, 0, 0, 0.04),
+      0 10px 30px rgba(0, 0, 0, 0.08),
+      0 2px 6px rgba(0, 0, 0, 0.04),
       inset 0 0 0 1px rgba(0, 0, 0, 0.03);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 4.5vmin;
+    padding: 11px;
     box-sizing: border-box;
   }
 
@@ -40,7 +37,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    border-radius: 10%;
+    border-radius: 20px;
     overflow: hidden;
     background: #f4f1ec;
   }
@@ -61,9 +58,9 @@
   }
 
   .loading {
-    width: 8vmin;
-    height: 8vmin;
-    border: 0.6vmin solid #eee;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #eee;
     border-top-color: #c98a3a;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -80,7 +77,7 @@
 
 <script>
   const GITHUB_USER   = "zeinabsadat";
-    const GITHUB_REPO   = "Gallery";
+  const GITHUB_REPO   = "Gallery";
   const GITHUB_BRANCH = "main";
   const intervalMs    = 30000;
 
