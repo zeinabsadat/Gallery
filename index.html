@@ -8,28 +8,27 @@
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
     font-family: system-ui, -apple-system, sans-serif;
   }
 
   .photo-card {
-    width: 220px;
-    height: 220px;
+    width: 100%;
+    height: 100%;
     background: #ffffff;
-    border-radius: 32px;
+    border-radius: 14%;
     box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.08),
-      0 2px 6px rgba(0, 0, 0, 0.04),
+      0 4vmin 12vmin rgba(0, 0, 0, 0.08),
+      0 1vmin 3vmin rgba(0, 0, 0, 0.04),
       inset 0 0 0 1px rgba(0, 0, 0, 0.03);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 12px;
+    padding: 5%;
     box-sizing: border-box;
   }
 
@@ -37,7 +36,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    border-radius: 22px;
+    border-radius: 10%;
     overflow: hidden;
     background: #f4f1ec;
   }
@@ -54,14 +53,13 @@
 
   .slide.active {
     opacity: 1;
-    transform: scale(1.08); /* افکت Ken Burns - زوم آروم */
+    transform: scale(1.08);
   }
 
-  /* لودینگ ساده وقتی منتظر لیست عکس‌هاست */
   .loading {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #eee;
+    width: 8vmin;
+    height: 8vmin;
+    border: 0.6vmin solid #eee;
     border-top-color: #c98a3a;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -77,17 +75,13 @@
   </div>
 
 <script>
-  /* ====== تنظیمات ====== */
   const GITHUB_USER   = "zeinabsadat";
-  const GITHUB_REPO   = "Gallery";
+    const GITHUB_REPO   = "Gallery";
   const GITHUB_BRANCH = "main";
-  const intervalMs    = 30000; // ۳۰ ثانیه
-  /* ===================== */
+  const intervalMs    = 30000;
 
   const frame   = document.getElementById('frame');
   const loading = document.getElementById('loading');
-
-  // فرمت‌های عکس قابل قبول
   const imageRegex = /\.(jpg|jpeg|png|gif|webp|avif)$/i;
 
   async function loadImages() {
@@ -96,7 +90,6 @@
       const res = await fetch(apiUrl);
       const files = await res.json();
 
-      // فقط عکس‌ها رو فیلتر کن و آدرس raw رو بگیر
       const images = files
         .filter(f => f.type === 'file' && imageRegex.test(f.name))
         .map(f => f.download_url);
@@ -107,9 +100,7 @@
         return;
       }
 
-      // ترتیب رندوم برای تنوع بیشتر
       images.sort(() => Math.random() - 0.5);
-
       startSlideshow(images);
     } catch (err) {
       console.error('خطا در بارگیری عکس‌ها:', err);
@@ -128,7 +119,6 @@
       frame.appendChild(div);
       slides.push(div);
 
-      // پری‌لود
       const img = new Image();
       img.src = src;
     });
