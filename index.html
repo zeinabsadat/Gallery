@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,29 +8,31 @@
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: transparent;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: system-ui, -apple-system, sans-serif;
   }
 
-  /* همون استایل کارت ساعت */
+  /* همیشه مربع — اندازه‌اش = کوچیکترین بُعد iframe */
   .photo-card {
-    width: 220px;
-    height: 220px;
+    width: 100vmin;
+    height: 100vmin;
     background: #ffffff;
-    border-radius: 32px;
+    border-radius: 14%;
     box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.08),
-      0 2px 6px rgba(0, 0, 0, 0.04),
+      0 4vmin 12vmin rgba(0, 0, 0, 0.08),
+      0 1vmin 3vmin rgba(0, 0, 0, 0.04),
       inset 0 0 0 1px rgba(0, 0, 0, 0.03);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 12px;
+    padding: 5vmin;
     box-sizing: border-box;
   }
 
@@ -38,7 +40,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    border-radius: 22px;
+    border-radius: 10%;
     overflow: hidden;
     background: #f4f1ec;
   }
@@ -55,67 +57,93 @@
 
   .slide.active {
     opacity: 1;
-    transform: scale(1.08); /* افکت نرم Ken Burns - زوم آروم */
+    transform: scale(1.08);
   }
+
+  .loading {
+    width: 8vmin;
+    height: 8vmin;
+    border: 0.6vmin solid #eee;
+    border-top-color: #c98a3a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
   <div class="photo-card">
-    <div class="photo-frame" id="frame"></div>
+    <div class="photo-frame" id="frame">
+      <div class="loading" id="loading"></div>
+    </div>
   </div>
 
 <script>
-  /* ====== فقط این لیست رو ویرایش کن ======
-     آدرس عکس‌هات از گیت‌هاب رو اینجا بذار.
-     اگه از GitHub Pages استفاده می‌کنی:
-       https://USERNAME.github.io/REPO/images/photo1.jpg
-     اگه از raw.githubusercontent.com استفاده می‌کنی:
-       https://raw.githubusercontent.com/USERNAME/REPO/main/images/photo1.jpg
-  */
-  const images = [
-    "images/photo1.jpg",
-    "images/photo2.jpg",
-    "images/photo3.jpg",
-    "images/photo4.jpg",
-    "images/photo5.jpg",
-    "images/photo6.jpg"
-  ];
+  const GITHUB_USER   = "zeinabsadat";
+    const GITHUB_REPO   = "Gallery";
+  const GITHUB_BRANCH = "main";
+  const intervalMs    = 30000;
 
-  const intervalMs = 30000; // ۳۰ ثانیه
-  /* ======================================= */
+  const frame   = document.getElementById('frame');
+  const loading = document.getElementById('loading');
+  const imageRegex = /\.(jpg|jpeg|png|gif|webp|avif)$/i;
 
-  const frame = document.getElementById('frame');
-  const slides = [];
+  async function loadImages() {
+    try {
+      const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/?ref=${GITHUB_BRANCH}`;
+      const res = await fetch(apiUrl);
+      const files = await res.json();
 
-  // پری‌لود همه عکس‌ها به صورت دو لایه (برای کراس‌فید نرم)
-  images.forEach((src) => {
-    const div = document.createElement('div');
-    div.className = 'slide';
-    div.style.backgroundImage = `url("${src}")`;
-    frame.appendChild(div);
-    slides.push(div);
+      const images = files
+        .filter(f => f.type === 'file' && imageRegex.test(f.name))
+        .map(f => f.download_url);
 
-    // پری‌لود
-    const img = new Image();
-    img.src = src;
-  });
+      if (images.length === 0) {
+        loading.style.display = 'none';
+        frame.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:12px;">No images found</div>';
+        return;
+      }
 
-  let current = 0;
-  if (slides.length > 0) slides[0].classList.add('active');
-
-  function nextSlide() {
-    if (slides.length < 2) return;
-    const prev = current;
-    current = (current + 1) % slides.length;
-
-    slides[current].classList.add('active');
-    // یه تاخیر کوتاه تا فید روی هم بیفته بعد قبلی محو بشه
-    setTimeout(() => {
-      slides[prev].classList.remove('active');
-    }, 1200);
+      images.sort(() => Math.random() - 0.5);
+      startSlideshow(images);
+    } catch (err) {
+      console.error('Error loading images:', err);
+      loading.style.display = 'none';
+    }
   }
 
-  setInterval(nextSlide, intervalMs);
+  function startSlideshow(images) {
+    loading.style.display = 'none';
+    const slides = [];
+
+    images.forEach((src) => {
+      const div = document.createElement('div');
+      div.className = 'slide';
+      div.style.backgroundImage = `url("${src}")`;
+      frame.appendChild(div);
+      slides.push(div);
+
+      const img = new Image();
+      img.src = src;
+    });
+
+    let current = 0;
+    slides[0].classList.add('active');
+
+    if (slides.length < 2) return;
+
+    setInterval(() => {
+      const prev = current;
+      current = (current + 1) % slides.length;
+
+      slides[current].classList.add('active');
+      setTimeout(() => {
+        slides[prev].classList.remove('active');
+      }, 1200);
+    }, intervalMs);
+  }
+
+  loadImages();
 </script>
 </body>
 </html>
